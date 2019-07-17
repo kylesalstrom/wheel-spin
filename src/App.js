@@ -25,7 +25,7 @@ class WheelWindow extends React.Component {
         topswing: 0,
         downswing: [],
       },
-      swingState: 0,
+      swingState: -2,
       paceCounter: 0,
       intervalId: 0,
     }
@@ -33,7 +33,7 @@ class WheelWindow extends React.Component {
 
   startSwing = () => {
     clearInterval(this.state.intervalId)
-    const newId = setInterval(() => this.paceTick, 1)
+    const newId = setInterval(() => this.paceTick(), 1)
     this.setState({
       intervalId: newId
     }) 
@@ -43,20 +43,38 @@ class WheelWindow extends React.Component {
   }
   paceTick = () => {
     this.setState((state) => {
-      return (state.swingState !== 0 || state.swingState !== 2) && state.paceCounter > 100 ?
-        { paceCounter: 0, swingState: state.swingState + 1, } :
-        { paceCounter: state.paceCounter + 1} 
+      if (state.paceCounter < 100) {
+        return { paceCounter: state.paceCounter + 1 } 
+      }
+      else {
+        switch (state.swingState) {
+          case 1:
+            return { paceCounter: state.paceCounter + 1 , swingState: 2, }
+          case 2:
+            return { paceCounter: state.paceCounter + 1 } 
+          case 3:
+            this.endSwing()
+            return { paceCounter: 0, swingState: -1, }
+          default:
+            break;
+        }
+      }
     })
   }
   
-  handleClick() {
+  handleClick = () => {
     this.setState({
+      wheelMovements: {
+        backswing: [],
+        topswing: 0,
+        downswing: [],
+      },
       swingState: 0,
       paceCounter: 0,
+      intervalId: 0,
     })
   }
   handleScroll = (e) => {
-    console.log(this.state)
     if (this.state.swingState === 0) {
       this.startSwing()
     }
@@ -71,21 +89,27 @@ class WheelWindow extends React.Component {
            case 1: //backswing in progress
              return {
               wheelMovements: {
-                 backswing: state.wheelMovements.backswing.slice(0, state.wheelMovements.backswing.length).concat([state.paceCounter])
+                 backswing: state.wheelMovements.backswing.slice(0, state.wheelMovements.backswing.length).concat([state.paceCounter]),
+                 topswing: state.wheelMovements.topswing,
+                 downswing: state.wheelMovements.downswing,
                },
              }
            case 2: //triggers downswing //existing state had been holding at topswing, 
              return {
                wheelMovements: {
+                 backswing: state.wheelMovements.backswing,
                  topswing: state.paceCounter,
-                 swingState: 3,
-                 paceCounter: 0,
+                 downswing: state.wheelMovements.downswing,
                },
+               swingState: 3,
+               paceCounter: 0,
              }
            case 3: //downswing in progress
              return {
                wheelMovements: {
-                 foreswing: state.wheelMovements.foreswing.slice(0, state.wheelMovements.foreswing.length).concat([state.paceCounter])
+                 backswing: state.wheelMovements.backswing,
+                 topswing: state.wheelMovements.topswing,
+                 downswing: state.wheelMovements.downswing.slice(0, state.wheelMovements.downswing.length).concat([state.paceCounter])
                },
                paceCounter: 0,
              }
@@ -100,18 +124,45 @@ class WheelWindow extends React.Component {
   }
 
   render() {
-    console.log(this.state.wheelMovements[this.state.wheelMovements.length - 1])
-    return this.state.swingState > 0 ?
+    const button = this.state.swingState >= 0 ?
       (
-        <button onWheel={this.handleScroll}>
+        <button className="bottomButton" onWheel={this.handleScroll}>
           <h1>{this.state.paceCounter}</h1>
         </button>
       )
-        :
+      :
       (
-      <button onWheel={this.handleScroll}>
-        <h1>x                  x</h1>
-      </button>
-    );
+        <button className="bottomButton" onWheel={this.handleScroll} onClick={this.handleClick}>
+          <h1>x                  x</h1>
+        </button>
+      );
+    const display = this.state.swingState === -1 ?
+      (
+        <div>
+        <div>
+          <ol>
+            {this.state.wheelMovements.backswing.map((n, index) => {
+              return <li key={index}>{n}</li>
+            })}
+          </ol>
+          </div>
+          <div>
+            <h1> {this.state.wheelMovements.topswing}</h1>
+          </div>
+        <div>
+          <ol>
+            {this.state.wheelMovements.downswing.map((n, index) => {
+              return <li key={index}>{n}</li>
+            })}
+          </ol>
+          </div>
+        </div>
+      )
+      :
+      (
+          <h1>{'go!'}</h1>
+      );
+    
+    return <div className="course" >{display}{button}</div>
   }
 }
