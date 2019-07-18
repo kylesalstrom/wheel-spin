@@ -43,7 +43,7 @@ class WheelWindow extends React.Component {
   }
   paceTick = () => {
     this.setState((state) => {
-      if (state.paceCounter < 100) {
+      if (state.paceCounter < 20) {
         return { paceCounter: state.paceCounter + 1 } 
       }
       else {
@@ -93,6 +93,7 @@ class WheelWindow extends React.Component {
                  topswing: state.wheelMovements.topswing,
                  downswing: state.wheelMovements.downswing,
                },
+               paceCounter: 0,
              }
            case 2: //triggers downswing //existing state had been holding at topswing, 
              return {
@@ -123,46 +124,51 @@ class WheelWindow extends React.Component {
       })
   }
 
+  buttonText = () => {
+    switch (this.state.swingState) {
+      case -2:
+        return 'x               x'
+      case -1:
+        return Math.max(60 - this.state.wheelMovements.backswing.length, (95 + this.state.wheelMovements.downswing.length) - (Math.abs(this.state.wheelMovements.topswing - 50)/2))
+          + " | "
+          + (this.state.wheelMovements.backswing.reduce((a, b) => a + b, 0) - this.state.wheelMovements.downswing.reduce((a, b) => a + b, 0))
+          + " | "
+          + (this.state.wheelMovements.backswing.length - this.state.wheelMovements.downswing.length)
+      default:
+        return this.state.paceCounter;
+    }
+  }
   render() {
-    const button = this.state.swingState >= 0 ?
-      (
-        <button className="bottomButton" onWheel={this.handleScroll}>
-          <h1>{this.state.paceCounter}</h1>
-        </button>
-      )
-      :
-      (
-        <button className="bottomButton" onWheel={this.handleScroll} onClick={this.handleClick}>
-          <h1>x                  x</h1>
-        </button>
-      );
-    const display = this.state.swingState === -1 ?
-      (
+    
+    
+    return (
+    <div className="course" >
+      <div>
         <div>
+          {this.state.wheelMovements.backswing.map((n, index) => {
+            return <h6 className="detailText" key={index}>{n}</h6>
+          })}
+        </div>
         <div>
-          <ol>
-            {this.state.wheelMovements.backswing.map((n, index) => {
-              return <li key={index}>{n}</li>
-            })}
-          </ol>
+          <div >
+              <h3 className="flankHeading">{this.state.wheelMovements.backswing.reduce((a, b) => a + b, 0)}</h3>
           </div>
           <div>
-            <h1> {this.state.wheelMovements.topswing}</h1>
+              <h2 className="centerHeading"> {this.state.wheelMovements.topswing}</h2>
           </div>
-        <div>
-          <ol>
-            {this.state.wheelMovements.downswing.map((n, index) => {
-              return <li key={index}>{n}</li>
-            })}
-          </ol>
+          <div>
+              <h3 className="flankHeading">{this.state.wheelMovements.downswing.reduce((a, b) => a + b, 0)}</h3>
           </div>
         </div>
-      )
-      :
-      (
-          <h1>{'go!'}</h1>
-      );
-    
-    return <div className="course" >{display}{button}</div>
-  }
+        <div>
+          {this.state.wheelMovements.downswing.map((n, index) => {
+            return <h6 className="detailText" key={index}>{n}</h6>
+          })}
+        </div>
+      </div>
+        <button className="bottomButton" onWheel={this.handleScroll} onClick={this.handleClick}>
+          <h1>{this.buttonText()}</h1>
+      </button>
+    </div>
+    )}
 }

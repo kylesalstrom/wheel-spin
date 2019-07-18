@@ -33,12 +33,33 @@
 }
 
 button.bottomButton {
-  position: absolute;
+  position: fixed;
   bottom: 10%;
+}
+h2.centerHeading {
+  position: relative;
+  color: blue;
+  margin-block-start: 0.33em;
+  margin-block-end: 0.33em;
+}
+h3.flankHeading {
+  position: relative;
+  color: green;
+  margin-block-start: 0.33em;
+  margin-block-end: 0.33em;
+}
+h6.detailText {
+  position: relative;
+  color: darkgray;
+  display: block;
+  font-size: 0.67em;
+  margin-block-start: 0.33em;
+  margin-block-end: 0.33em;
+  font-weight: bold;
 }
 
 div.course{
-  width: 100vh;
-  height: 600px;
+  /* width: 100vh; */
+  height: 90vh;
   /* background-image: url(./courses/drawing.svg); */
 }
