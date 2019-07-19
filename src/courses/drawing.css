@@ -1,0 +1,17 @@
+@keyframes pupil {
+
+    75%,
+    50%,
+    35% {
+        transform: translate(20px, -4px);
+    }
+
+    55%,
+    65% {
+        transform: translate(-20px, 5px);
+    }
+}
+
+circle.eye {
+    animation: pupil 3s ease-in-out infinite
+}
