@@ -33,7 +33,7 @@
 }
 
 button.bottomButton {
-  position: fixed;
+  position: relative;
   bottom: 10%;
 }
 h2.centerHeading {

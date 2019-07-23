@@ -28,13 +28,15 @@ class WheelWindow extends React.Component {
       intervalId: 0,
       isBackswingDeltaPostive: false,
       ball: {
-        x: 200,
-        y: 25,
+        x: 125,
+        y: 250,
       },
       shot: {
         x: 83,
         y: 120,
-      }
+      },
+      angle: -30,
+      clubDistance: 100,
     }
   }
 
@@ -60,26 +62,34 @@ class WheelWindow extends React.Component {
           case 2:
             return { paceCounter: state.paceCounter + 1 } 
           case 3:
+            const dist = (Math.max(60 - this.state.backswing.length, (95 + this.state.downswing.length) - (Math.abs(this.state.topswing - 50) / 2)) * state.clubDistance)/100
             return {
               shot: {
-                x: 65 - (this.state.backswing.reduce((a, b) => a + b, 0) - this.state.downswing.reduce((a, b) => a + b, 0)),
-                y: 210 - Math.max(60 - this.state.backswing.length, (95 + this.state.downswing.length) - (Math.abs(this.state.topswing - 50) / 2)),
+                x: state.ball.x + (dist * Math.sin(state.angle * Math.PI / 180)),
+                y: state.ball.y - (dist * Math.cos(state.angle * Math.PI / 180)),
               }, swingState: 4,
             }
           case 4:
+            if (Math.abs(state.shot.x - state.ball.x) < .1 && Math.abs(state.shot.y - state.ball.y) < .1)
+            {
+              return { ball: { x: state.shot.x, y: state.shot.y }, swingState: 5 }
+              }
+            const ix = (state.shot.x - state.ball.x) / (state.shot.y - state.ball.y)
+            const iy = (state.shot.y - state.ball.y) / (state.shot.x - state.ball.x)
             let dx = 0
             let dy = 0
+            
             if (state.ball.x < state.shot.x) {
-              dx = 1
+              dx = ix
             }
             else if (state.ball.x > state.shot.x) {
-              dx = -1
+              dx = -ix
             }
             if (state.ball.y < state.shot.y) {
-              dy = 2.5
+              dy = iy
             }
             else if (state.ball.y > state.shot.y) {
-              dy = -2.5
+              dy = -iy
             }
             if (dx === 0 && dy === 0) {
               return { swingState: 5, }
@@ -98,7 +108,15 @@ class WheelWindow extends React.Component {
       }
     })
   }
-  
+  handleClickLeft = () => {
+    this.setState((state) => {
+      return { angle: state.angle - 1 }
+  }) }
+  handleClickRight = () => {
+    this.setState((state) => {
+      return { angle: state.angle + 1 }
+    })
+  }
   handleClick = () => {
     this.endSwing()
     this.setState({
@@ -162,6 +180,8 @@ class WheelWindow extends React.Component {
     switch (this.state.swingState) {
       case -2:
         return 'x            x'
+      case 0:
+        return this.state.angle
       case 4:
         return this.state.ball.x + ' | ' + this.state.ball.y
       case -1:
@@ -327,7 +347,13 @@ class WheelWindow extends React.Component {
                 cx={this.state.ball.x}
                 cy={this.state.ball.y}
           r="1"
-              style={{ fill: '#ffffff', strokeWidth: '0.25' }} />
+                style={{ fill: '#ffffff', strokeWidth: '0.25' }} />
+              <circle
+                id="path4976"
+                cx={this.state.shot.x}
+                cy={this.state.shot.y}
+                r="1"
+                style={{ fill: '#ffff00', strokeWidth: '0.25' }} />
       </g>
           </svg >
         </div>
@@ -353,10 +379,16 @@ class WheelWindow extends React.Component {
             return <h6 className="detailText" key={index}>{n}</h6>
           })}
         </div>
-      </div>
+        </div>
+        <button className="bottomButton"onClick={this.handleClickLeft}>
+          <h1>{'<--'}</h1>
+        </button>
         <button className="bottomButton" onWheel={this.handleScroll} onClick={this.handleClick}>
           <h1>{this.buttonText()}</h1>
-      </button>
+        </button>
+        <button className="bottomButton" onClick={this.handleClickRight}>
+          <h1>{'-->'}</h1>
+        </button>
     </div>
     )}
 }
