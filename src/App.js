@@ -32,8 +32,8 @@ class WheelWindow extends React.Component {
         y: 250,
       },
       shot: {
-        x: 83,
-        y: 120,
+        x: 0,
+        y: 0,
       },
       angle: -30,
       clubDistance: 100,
@@ -73,7 +73,25 @@ class WheelWindow extends React.Component {
             if (Math.abs(state.shot.x - state.ball.x) < .1 && Math.abs(state.shot.y - state.ball.y) < .1)
             {
               return { ball: { x: state.shot.x, y: state.shot.y }, swingState: 5 }
-              }
+            }
+            
+            console.log('________')
+            console.log('shot: ' + state.shot.x + ' | ' + state.shot.y)
+            console.log('start: ' + state.ball.x + " | " + state.ball.y)
+            // const hx = state.ball.x + (state.shot.aim / 10)
+            // const hy = state.ball.y + ((1 / state.shot.aim) / 10)
+            // const ix = (state.shot.x - hx) / Math.abs(state.shot.y - hy)
+            // const iy = (state.shot.y - hy) / Math.abs(state.shot.x - hx)
+
+            // console.log(state.shot.aim + " | " + (1 / state.shot.aim))
+            // console.log(hx + " | " + hy)
+            // console.log(ix + " | " + iy)
+
+            // const newX = hx //+ ix/10
+            // const newY = hy //+ iy / 10
+            // console.log('dest: ' + newX + ' | ' + newY)
+
+
             const ix = (state.shot.x - state.ball.x) / (state.shot.y - state.ball.y)
             const iy = (state.shot.y - state.ball.y) / (state.shot.x - state.ball.x)
             let dx = 0
@@ -342,18 +360,18 @@ class WheelWindow extends React.Component {
                 style={{ fill: '#ff0000', strokeWidth: '0.26458332' }}
                 id="path4043-4"
               d="m 99.18786,204.43126 a 0.21715648,0.21715648 0 0 1 -0.202463,0.21666 0.21715648,0.21715648 0 0 1 -0.229862,-0.18734 0.21715648,0.21715648 0 0 1 0.171354,-0.24201 0.21715648,0.21715648 0 0 1 0.253052,0.15458" />
-        <circle
+              <circle
+                id="path4976"
+                cx={this.state.shot.x}
+                cy={this.state.shot.y}
+                r="1.25"
+                style={{ fill: '#000', strokeWidth: '0.25' }} />
+              <circle
                 id="path4975"
                 cx={this.state.ball.x}
                 cy={this.state.ball.y}
           r="1"
                 style={{ fill: '#ffffff', strokeWidth: '0.25' }} />
-              <circle
-                id="path4976"
-                cx={this.state.shot.x}
-                cy={this.state.shot.y}
-                r="1"
-                style={{ fill: '#ffff00', strokeWidth: '0.25' }} />
       </g>
           </svg >
         </div>
