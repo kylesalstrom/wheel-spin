@@ -34,9 +34,10 @@ class WheelWindow extends React.Component {
       shot: {
         x: 0,
         y: 0,
+        aim: 1,
       },
       angle: 205,
-      clubDistance: 100,
+      clubDistance: 140,
     }
   }
 
@@ -68,6 +69,7 @@ class WheelWindow extends React.Component {
               shot: {
                 x: state.ball.x + (dist * Math.sin((clubface + state.angle) * Math.PI / 180)),
                 y: state.ball.y + (dist * Math.cos((clubface + state.angle) * Math.PI / 180)),
+                aim: clubface + state.angle//Math.sin((clubface + state.angle) * Math.PI / 180) / Math.cos((clubface + state.angle) * Math.PI / 180)
               }, swingState: 4,
             }
           case 4:
@@ -91,24 +93,24 @@ class WheelWindow extends React.Component {
             // const newX = hx //+ ix/10
             // const newY = hy //+ iy / 10
             // console.log('dest: ' + newX + ' | ' + newY)
+            console.log(state.shot.aim)
 
-
-            const ix = (state.shot.x - state.ball.x) / Math.abs(state.shot.y - state.ball.y)
-            const iy = (state.shot.y - state.ball.y) / Math.abs(state.shot.x - state.ball.x)
+            // const ix = state.shot.aim //(state.shot.x - state.ball.x) / Math.abs(state.shot.y - state.ball.y)
+            // const iy = 1 / state.shot.aim //(state.shot.y - state.ball.y) / Math.abs(state.shot.x - state.ball.x)
             let dx = 0
             let dy = 0
             
             if (state.ball.x < state.shot.x) {
-              dx = ix
+              dx = -Math.sin((state.shot.aim) * Math.PI / 180) 
             }
             else if (state.ball.x > state.shot.x) {
-              dx = ix
+              dx = Math.sin((state.shot.aim) * Math.PI / 180) 
             }
             if (state.ball.y < state.shot.y) {
-              dy = iy
+              dy = -Math.cos((state.shot.aim) * Math.PI / 180) 
             }
             else if (state.ball.y > state.shot.y) {
-              dy = iy
+              dy = Math.cos((state.shot.aim) * Math.PI / 180) 
             }
             if (dx === 0 && dy === 0) {
               return { swingState: 5, }
