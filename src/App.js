@@ -35,7 +35,7 @@ class WheelWindow extends React.Component {
         x: 0,
         y: 0,
       },
-      angle: -30,
+      angle: 205,
       clubDistance: 100,
     }
   }
@@ -62,11 +62,12 @@ class WheelWindow extends React.Component {
           case 2:
             return { paceCounter: state.paceCounter + 1 } 
           case 3:
-            const dist = (Math.max(60 - this.state.backswing.length, (95 + this.state.downswing.length) - (Math.abs(this.state.topswing - 50) / 2)) * state.clubDistance)/100
+            const dist = (Math.max(60 - this.state.backswing.length, (95 + this.state.downswing.length) - (Math.abs(this.state.topswing - 50) / 2)) * state.clubDistance) / 100
+            const clubface = (this.state.backswing.reduce((a, b) => a + b, 0) - this.state.downswing.reduce((a, b) => a + b, 0)) / 2
             return {
               shot: {
-                x: state.ball.x + (dist * Math.sin(state.angle * Math.PI / 180)),
-                y: state.ball.y - (dist * Math.cos(state.angle * Math.PI / 180)),
+                x: state.ball.x + (dist * Math.sin((clubface + state.angle) * Math.PI / 180)),
+                y: state.ball.y + (dist * Math.cos((clubface + state.angle) * Math.PI / 180)),
               }, swingState: 4,
             }
           case 4:
@@ -92,8 +93,8 @@ class WheelWindow extends React.Component {
             // console.log('dest: ' + newX + ' | ' + newY)
 
 
-            const ix = (state.shot.x - state.ball.x) / (state.shot.y - state.ball.y)
-            const iy = (state.shot.y - state.ball.y) / (state.shot.x - state.ball.x)
+            const ix = (state.shot.x - state.ball.x) / Math.abs(state.shot.y - state.ball.y)
+            const iy = (state.shot.y - state.ball.y) / Math.abs(state.shot.x - state.ball.x)
             let dx = 0
             let dy = 0
             
@@ -101,13 +102,13 @@ class WheelWindow extends React.Component {
               dx = ix
             }
             else if (state.ball.x > state.shot.x) {
-              dx = -ix
+              dx = ix
             }
             if (state.ball.y < state.shot.y) {
               dy = iy
             }
             else if (state.ball.y > state.shot.y) {
-              dy = -iy
+              dy = iy
             }
             if (dx === 0 && dy === 0) {
               return { swingState: 5, }
@@ -128,27 +129,43 @@ class WheelWindow extends React.Component {
   }
   handleClickLeft = () => {
     this.setState((state) => {
-      return { angle: state.angle - 1 }
+      return {
+        angle: state.angle + 1,
+        shot: {
+          x: state.ball.x + (state.clubDistance * Math.sin((state.angle + 1) * Math.PI / 180)),
+          y: state.ball.y + (state.clubDistance * Math.cos((state.angle + 1) * Math.PI / 180)),
+        }, }
   }) }
   handleClickRight = () => {
     this.setState((state) => {
-      return { angle: state.angle + 1 }
+      return {
+        angle: state.angle - 1,
+        shot: {
+          x: state.ball.x + (state.clubDistance * Math.sin((state.angle - 1) * Math.PI / 180)),
+          y: state.ball.y + (state.clubDistance * Math.cos((state.angle - 1) * Math.PI / 180)),
+        }, }
     })
   }
   handleClick = () => {
     this.endSwing()
-    this.setState({
-      backswing: [],
-      topswing: 0,
-      downswing: [],
-      swingState: 0,
-      paceCounter: 0,
-      intervalId: 0,
-      isBackswingDeltaPostive: false,
-      ball: {
-        x: 125,
-        y: 250,
-      },
+    this.setState((state) => {
+      return {
+        backswing: [],
+        topswing: 0,
+        downswing: [],
+        swingState: 0,
+        paceCounter: 0,
+        intervalId: 0,
+        isBackswingDeltaPostive: false,
+        ball: {
+          x: 125,
+          y: 250,
+        },
+        shot: {
+          x: state.ball.x + (state.clubDistance * Math.sin((state.angle) * Math.PI / 180)),
+          y: state.ball.y + (state.clubDistance * Math.cos((state.angle) * Math.PI / 180)),
+        },
+      }
     })
   }
   handleScroll = (e) => {
